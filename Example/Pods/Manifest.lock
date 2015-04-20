@@ -1,0 +1,14 @@
+PODS:
+  - BABCropperView (0.1.0)
+
+DEPENDENCIES:
+  - BABCropperView (from `../`)
+
+EXTERNAL SOURCES:
+  BABCropperView:
+    :path: ../
+
+SPEC CHECKSUMS:
+  BABCropperView: e43c55b8a9ff69ebe4502b06e53ec631fc56883a
+
+COCOAPODS: 0.35.0
