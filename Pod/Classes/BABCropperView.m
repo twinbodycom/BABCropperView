@@ -253,7 +253,7 @@ static inline UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *
     self.backgroundColor = [UIColor blackColor];
 
     self.scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
-    self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.showsVerticalScrollIndicator = NO;
     self.scrollView.delegate = self;
@@ -263,7 +263,7 @@ static inline UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *
     [self.scrollView addSubview:self.imageView];
     
     self.cropMaskView = [[UIView alloc] initWithFrame:self.bounds];
-    self.cropMaskView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self.cropMaskView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.cropMaskView.userInteractionEnabled = NO;
     self.cropMaskView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:BABCropperViewMaskBackgroundColorAlpha];
     [self addSubview:self.cropMaskView];
