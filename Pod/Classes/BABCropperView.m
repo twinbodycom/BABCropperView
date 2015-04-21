@@ -381,7 +381,8 @@ static inline UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *
     self.borderView.frame = self.displayCropRect;
 
     CAShapeLayer *maskLayer = (CAShapeLayer *)self.cropMaskView.layer.mask;
-    
+    maskLayer.frame = self.cropMaskView.bounds;
+
     UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.displayCropRect];
     [path appendPath:[UIBezierPath bezierPathWithRect:maskLayer.frame]];
     maskLayer.path = path.CGPath;
