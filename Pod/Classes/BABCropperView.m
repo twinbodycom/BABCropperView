@@ -13,7 +13,7 @@
 static const CGFloat BABCropperViewMaximumZoomScale = 4.0f;
 static const CGFloat BABCropperViewMaskBackgroundColorAlpha = 0.7f;
 
-static inline CGSize BABCropperViewScaledSizeToFitSize(CGSize size, CGSize fitSize) {
+static CGSize BABCropperViewScaledSizeToFitSize(CGSize size, CGSize fitSize) {
     
     if(fitSize.width >= size.width && fitSize.height >= size.height) { //already the correct size
         
@@ -57,7 +57,7 @@ static inline CGSize BABCropperViewScaledSizeToFitSize(CGSize size, CGSize fitSi
     return fittedSize;
 }
 
-static inline UIImageOrientation BABCropperViewImageOrientationFromEXIFOrientation(NSUInteger EXIFOrienation) {
+static UIImageOrientation BABCropperViewImageOrientationFromEXIFOrientation(NSUInteger EXIFOrienation) {
  
     switch (EXIFOrienation) {
         case 1:
@@ -90,7 +90,7 @@ static inline UIImageOrientation BABCropperViewImageOrientationFromEXIFOrientati
     }
 }
 
-static inline UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize) {
+static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize) {
     
     NSData *imageJPEGData = UIImageJPEGRepresentation(image, 1.0f);
     CGImageSourceRef imageSourceRef = CGImageSourceCreateWithData((__bridge CFDataRef)(imageJPEGData), NULL);
