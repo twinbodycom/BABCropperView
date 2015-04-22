@@ -5,9 +5,11 @@ A customizable image cropper view based on UIScrollView.
 
 Supports iOS 7.0+
 
+* Crop size is fully configurable
 * Allows cropping of any part of the image
 * Fully customizable with sensible defaults
 * Works easily with or without Auto Layout
+* Uses memory efficient image crop which handles multiple image orientations
 
 This is a UIView subclass which allows a user to crop an image to a desired size.
 
