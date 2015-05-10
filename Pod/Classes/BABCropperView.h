@@ -12,10 +12,12 @@
 
 @property (nonatomic, assign) CGSize cropSize;
 @property (nonatomic, strong) UIImage *image;
+@property (nonatomic, strong) UIBezierPath *cropMaskPath;
 @property (nonatomic, strong) UIView *cropMaskView;
 @property (nonatomic, readonly) UIView *borderView;
 @property (nonatomic, assign) CGFloat cropDisplayScale; //defaults to 1.0f
 @property (nonatomic, assign) UIOffset cropDisplayOffset; //defaults to UIOffsetZero
+@property (nonatomic, assign) BOOL cropsImageToCircle; // defaults to NO;
 
 - (void)renderCroppedImage:(void (^)(UIImage *croppedImage))completionBlock;
 

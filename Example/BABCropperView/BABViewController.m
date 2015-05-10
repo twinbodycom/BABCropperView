@@ -24,6 +24,7 @@
     [super viewDidLoad];
     
     self.cropperView.cropSize = CGSizeMake(640.0f, 640.0f);
+    self.cropperView.cropsImageToCircle = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated {

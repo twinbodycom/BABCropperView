@@ -90,7 +90,7 @@ static UIImageOrientation BABCropperViewImageOrientationFromEXIFOrientation(NSUI
     }
 }
 
-static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize) {
+static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle) {
     
     NSData *imageJPEGData = UIImageJPEGRepresentation(image, 1.0f);
     CGImageSourceRef imageSourceRef = CGImageSourceCreateWithData((__bridge CFDataRef)(imageJPEGData), NULL);
@@ -187,6 +187,12 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     
     if(scaleSize.height - drawRect.size.height > 0) {
         drawRect.origin.y-= (scaleSize.height - drawRect.size.height)/2;
+    }
+    
+    if(cropToCircle) {
+        
+        CGContextAddEllipseInRect(bitmap, CGRectMake(0, 0, scaleSize.width, scaleSize.height));
+        CGContextClip(bitmap);
     }
     
     CGContextSetInterpolationQuality(bitmap, kCGInterpolationHigh);
@@ -300,6 +306,13 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     [self setNeedsLayout];
 }
 
+- (void)setCropsImageToCircle:(BOOL)cropsImageToCircle {
+    
+    _cropsImageToCircle = cropsImageToCircle;
+    
+    [self setNeedsLayout];
+}
+
 #pragma mark - View Configuration
 
 - (void)layoutSubviews {
@@ -318,6 +331,18 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         displayCropRect.origin.x += self.cropDisplayOffset.horizontal;
         displayCropRect.origin.y += self.cropDisplayOffset.vertical;
         self.displayCropRect = displayCropRect;
+        
+        
+        if(self.cropsImageToCircle) {
+            
+            self.borderView.layer.cornerRadius = CGRectGetWidth(self.borderView.bounds)/2.0f;
+            self.borderView.clipsToBounds = YES;
+        }
+        else {
+            
+            self.borderView.layer.cornerRadius = 0;
+            self.borderView.clipsToBounds = NO;
+        }
         
         [self updateScrollViewZoomScales];
         [self updateMaskView];
@@ -383,9 +408,19 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     CAShapeLayer *maskLayer = (CAShapeLayer *)self.cropMaskView.layer.mask;
     maskLayer.frame = self.cropMaskView.bounds;
 
-    UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.displayCropRect];
-    [path appendPath:[UIBezierPath bezierPathWithRect:maskLayer.frame]];
-    maskLayer.path = path.CGPath;
+    if(self.cropsImageToCircle){
+        
+        UIBezierPath *path = [UIBezierPath bezierPathWithOvalInRect:self.displayCropRect];
+        [path appendPath:[UIBezierPath bezierPathWithRect:maskLayer.frame]];
+        maskLayer.path = path.CGPath;
+
+    }
+    else {
+        
+        UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.displayCropRect];
+        [path appendPath:[UIBezierPath bezierPathWithRect:maskLayer.frame]];
+        maskLayer.path = path.CGPath;
+    }
 }
 
 - (void)centerImageInScrollView:(UIScrollView *)scrollView {
@@ -416,10 +451,11 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     
     UIImage *image = self.image;
     CGSize cropSize = self.cropSize;
+    BOOL cropToCircle = self.cropsImageToCircle;
     
     [self.operationQueue addOperationWithBlock:^{
         
-        UIImage *croppedImage = BABCropperViewCroppedAndScaledImageWithCropRect(image, cropRect, cropSize);
+        UIImage *croppedImage = BABCropperViewCroppedAndScaledImageWithCropRect(image, cropRect, cropSize, cropToCircle);
         
         dispatch_async(dispatch_get_main_queue(), ^{
             
