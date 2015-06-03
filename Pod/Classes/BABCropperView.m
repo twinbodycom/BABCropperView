@@ -154,7 +154,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         case UIImageOrientationRight:
         case UIImageOrientationRightMirrored: {
             
-            scaledSize = BABScaledSizeFromSizeToWidth(imageSize, scaleSize.height);
+            scaledSize = BABScaledSizeFromSizeToHeight(imageSize, scaleSize.height);
         }
             break;
             
