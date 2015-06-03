@@ -90,6 +90,18 @@ static UIImageOrientation BABCropperViewImageOrientationFromEXIFOrientation(NSUI
     }
 }
 
+static CGSize BABScaledSizeFromSizeToWidth(CGSize fromSize, CGFloat width) {
+    
+    CGFloat scale = fromSize.width / width;
+    return CGSizeMake(width, fromSize.height/scale);
+}
+
+static CGSize BABScaledSizeFromSizeToHeight(CGSize fromSize, CGFloat height) {
+    
+    CGFloat scale = fromSize.height / height;
+    return CGSizeMake(fromSize.width/scale, height);
+}
+
 static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle) {
     
     NSData *imageJPEGData = UIImageJPEGRepresentation(image, 1.0f);
@@ -101,7 +113,12 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     NSUInteger EXIFOrientation = [(NSNumber *)CFDictionaryGetValue(imagePropertiesRef, kCGImagePropertyOrientation) unsignedIntegerValue];
     
     UIImageOrientation imageOrientation = BABCropperViewImageOrientationFromEXIFOrientation(EXIFOrientation);
-    CGSize imageSize = image.size;
+    
+    CGFloat width = [(NSNumber *)CFDictionaryGetValue(imagePropertiesRef, kCGImagePropertyPixelWidth) floatValue];
+    CGFloat height = [(NSNumber *)CFDictionaryGetValue(imagePropertiesRef, kCGImagePropertyPixelHeight) floatValue];
+    
+    CGSize imageSize = CGSizeMake(width, height);
+    
     CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
 
     CFRelease(imagePropertiesRef);
@@ -129,16 +146,15 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         case UIImageOrientationDown:
         case UIImageOrientationDownMirrored: {
             
-            CGFloat scale = imageSize.width / scaleSize.width;
-            scaledSize = CGSizeMake(scaleSize.width, imageSize.height/scale);
+            scaledSize = BABScaledSizeFromSizeToWidth(imageSize, scaleSize.width);
         }
             break;
         case UIImageOrientationLeft:
         case UIImageOrientationLeftMirrored:
         case UIImageOrientationRight:
         case UIImageOrientationRightMirrored: {
-            CGFloat scale = imageSize.height / scaleSize.width;
-            scaledSize = CGSizeMake(imageSize.width/scale, scaleSize.width);
+            
+            scaledSize = BABScaledSizeFromSizeToWidth(imageSize, scaleSize.height);
         }
             break;
             
