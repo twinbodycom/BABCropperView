@@ -18,6 +18,7 @@
 @property (nonatomic, assign) CGFloat cropDisplayScale; //defaults to 1.0f
 @property (nonatomic, assign) UIOffset cropDisplayOffset; //defaults to UIOffsetZero
 @property (nonatomic, assign) BOOL cropsImageToCircle; // defaults to NO;
+@property (nonatomic, assign) BOOL leavesUnfilledRegionsTransparent; // defaults to NO;
 
 - (void)renderCroppedImage:(void (^)(UIImage *croppedImage))completionBlock;
 

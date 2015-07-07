@@ -102,7 +102,7 @@ static CGSize BABScaledSizeFromSizeToHeight(CGSize fromSize, CGFloat height) {
     return CGSizeMake(fromSize.width/scale, height);
 }
 
-static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle) {
+static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle, BOOL transparent) {
     
     NSData *imageJPEGData = UIImageJPEGRepresentation(image, 1.0f);
     CGImageSourceRef imageSourceRef = CGImageSourceCreateWithData((__bridge CFDataRef)(imageJPEGData), NULL);
@@ -197,14 +197,6 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     drawRect = CGRectApplyAffineTransform(drawRect, rectTransform);
     drawRect = CGRectIntegral(drawRect);
     
-    if(scaleSize.width - drawRect.size.width > 0) {
-        drawRect.origin.x+= (scaleSize.width - drawRect.size.width)/2;
-    }
-    
-    if(scaleSize.height - drawRect.size.height > 0) {
-        drawRect.origin.y-= (scaleSize.height - drawRect.size.height)/2;
-    }
-    
     if(cropToCircle) {
         
         CGContextAddEllipseInRect(bitmap, CGRectMake(0, 0, scaleSize.width, scaleSize.height));
@@ -212,7 +204,11 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     }
     
     CGContextSetInterpolationQuality(bitmap, kCGInterpolationHigh);
-    CGContextFillRect(bitmap, CGRectMake(0, 0, cropRect.size.width, cropRect.size.height));
+    
+    if(!transparent) {
+        
+        CGContextFillRect(bitmap, CGRectMake(0, 0, cropRect.size.width, cropRect.size.height));
+    }
     
     CGContextDrawImage(bitmap, drawRect, thumbnail);
     
@@ -468,10 +464,11 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     UIImage *image = self.image;
     CGSize cropSize = self.cropSize;
     BOOL cropToCircle = self.cropsImageToCircle;
+    BOOL leavesUnfilledRegionsTransparent = self.leavesUnfilledRegionsTransparent;
     
     [self.operationQueue addOperationWithBlock:^{
         
-        UIImage *croppedImage = BABCropperViewCroppedAndScaledImageWithCropRect(image, cropRect, cropSize, cropToCircle);
+        UIImage *croppedImage = BABCropperViewCroppedAndScaledImageWithCropRect(image, cropRect, cropSize, cropToCircle, leavesUnfilledRegionsTransparent);
         
         dispatch_async(dispatch_get_main_queue(), ^{
             

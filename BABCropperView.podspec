@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "BABCropperView"
-  s.version          = "0.3.1"
+  s.version          = "0.3.2"
   s.summary          = "A customizable image cropper view based on UIScrollView."
   s.description      = <<-DESC
                        A customizable image cropper view based on UIScrollView.
