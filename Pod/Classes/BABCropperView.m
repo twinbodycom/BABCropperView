@@ -57,39 +57,6 @@ static CGSize BABCropperViewScaledSizeToFitSize(CGSize size, CGSize fitSize) {
     return fittedSize;
 }
 
-static UIImageOrientation BABCropperViewImageOrientationFromEXIFOrientation(NSUInteger EXIFOrienation) {
- 
-    switch (EXIFOrienation) {
-        case 1:
-            return UIImageOrientationUp;
-            break;
-        case 2:
-            return UIImageOrientationUpMirrored;
-            break;
-        case 3:
-            return UIImageOrientationDown;
-            break;
-        case 4:
-            return UIImageOrientationDownMirrored;
-            break;
-        case 5:
-            return UIImageOrientationLeftMirrored;
-            break;
-        case 6:
-            return UIImageOrientationRight;
-            break;
-        case 7:
-            return UIImageOrientationRightMirrored;
-            break;
-        case 8:
-            return UIImageOrientationLeft;
-            break;
-        default:
-            return UIImageOrientationUp;
-            break;
-    }
-}
-
 static CGSize BABScaledSizeFromSizeToWidth(CGSize fromSize, CGFloat width) {
     
     CGFloat scale = fromSize.width / width;
@@ -104,24 +71,9 @@ static CGSize BABScaledSizeFromSizeToHeight(CGSize fromSize, CGFloat height) {
 
 static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle, BOOL transparent) {
     
-    NSData *imageJPEGData = UIImageJPEGRepresentation(image, 1.0f);
-    CGImageSourceRef imageSourceRef = CGImageSourceCreateWithData((__bridge CFDataRef)(imageJPEGData), NULL);
-    
-    NSDictionary *options = @{(NSString *)kCGImageSourceShouldCache: @NO};
-    CFDictionaryRef imagePropertiesRef = CGImageSourceCopyPropertiesAtIndex(imageSourceRef, 0, (__bridge CFDictionaryRef)options);
-
-    NSUInteger EXIFOrientation = [(NSNumber *)CFDictionaryGetValue(imagePropertiesRef, kCGImagePropertyOrientation) unsignedIntegerValue];
-    
-    UIImageOrientation imageOrientation = BABCropperViewImageOrientationFromEXIFOrientation(EXIFOrientation);
-    
-    CGFloat width = [(NSNumber *)CFDictionaryGetValue(imagePropertiesRef, kCGImagePropertyPixelWidth) floatValue];
-    CGFloat height = [(NSNumber *)CFDictionaryGetValue(imagePropertiesRef, kCGImagePropertyPixelHeight) floatValue];
-    
-    CGSize imageSize = CGSizeMake(width, height);
+    CGSize imageSize = image.size;
     
     CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
-
-    CFRelease(imagePropertiesRef);
     
     CGFloat scale = 1.0f;
     
@@ -136,11 +88,9 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     
     CGContextRef bitmap = CGBitmapContextCreate(NULL, scaleSize.width, scaleSize.height, 8, scaleSize.width * 4, colorspace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
     
-    CGFloat cropScaleFactor = cropRect.size.width/scaleSize.width;
-    
     CGSize scaledSize;
     
-    switch (imageOrientation) {
+    switch (image.imageOrientation) {
         case UIImageOrientationUp:
         case UIImageOrientationUpMirrored:
         case UIImageOrientationDown:
@@ -162,44 +112,14 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
             break;
     }
     
-    CGFloat maxPixelSize = 0;
-    
-    if(cropScaleFactor < 1.0) {
-        
-        maxPixelSize = MAX(scaledSize.width / cropScaleFactor, scaledSize.height / cropScaleFactor);
-    }
-    else {
-        
-        maxPixelSize = MAX(scaledSize.width * cropScaleFactor, scaledSize.height *cropScaleFactor);
-    }
-    
-    
-    NSDictionary *thumbnailOptions = @{(id)kCGImageSourceCreateThumbnailWithTransform: (id)kCFBooleanTrue,
-                                       (id)(id)kCGImageSourceCreateThumbnailFromImageAlways: (id)kCFBooleanTrue,
-                                       (id)kCGImageSourceThumbnailMaxPixelSize: @(maxPixelSize)};
-    
-    CGImageRef thumbnail = CGImageSourceCreateThumbnailAtIndex(imageSourceRef, 0, (__bridge CFDictionaryRef)thumbnailOptions);
-    
-    switch (imageOrientation) {
-        case UIImageOrientationLeft:
-        case UIImageOrientationLeftMirrored:
-        case UIImageOrientationRight:
-        case UIImageOrientationRightMirrored:
-            imageSize = CGSizeMake(imageSize.height, imageSize.width);
-            break;
-        default:
-            break;
-    }
-    
     CGRect drawRect = CGRectMake(-cropRect.origin.x, -cropRect.origin.y, imageSize.width, imageSize.height);
     drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformMakeScale(scale, scale));
-    CGAffineTransform rectTransform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, -1.0), CGAffineTransformMakeTranslation(0, scaleSize.height));
+    CGAffineTransform rectTransform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0f, -1.0f), CGAffineTransformMakeTranslation(0.0f, scaleSize.height));
     drawRect = CGRectApplyAffineTransform(drawRect, rectTransform);
-    drawRect = CGRectIntegral(drawRect);
     
     if(cropToCircle) {
         
-        CGContextAddEllipseInRect(bitmap, CGRectMake(0, 0, scaleSize.width, scaleSize.height));
+        CGContextAddEllipseInRect(bitmap, CGRectMake(0.0f, 0.0f, scaleSize.width, scaleSize.height));
         CGContextClip(bitmap);
     }
     
@@ -207,19 +127,17 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     
     if(!transparent) {
         
-        CGContextFillRect(bitmap, CGRectMake(0, 0, cropRect.size.width, cropRect.size.height));
+        CGContextFillRect(bitmap, CGRectMake(0.0f, 0.0f, cropRect.size.width, cropRect.size.height));
     }
     
-    CGContextDrawImage(bitmap, drawRect, thumbnail);
+    CGContextDrawImage(bitmap, drawRect, image.CGImage);
     
     CGImageRef newImageRef = CGBitmapContextCreateImage(bitmap);
     UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
     
     CGContextRelease(bitmap);
     CGImageRelease(newImageRef);
-    CGImageRelease(thumbnail);
     CGColorSpaceRelease(colorspace);
-    CFRelease(imageSourceRef);
     
     return newImage;
 }
@@ -457,9 +375,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     cropFrameRect.size.width = self.displayCropRect.size.width;
     cropFrameRect.size.height = self.displayCropRect.size.height;
     
-    CGRect scrollViewRect = [self.scrollView convertRect:cropFrameRect toView:self.imageView];
-
-    CGRect cropRect = CGRectIntegral(scrollViewRect);
+    CGRect cropRect = [self.scrollView convertRect:cropFrameRect toView:self.imageView];
     
     UIImage *image = self.image;
     CGSize cropSize = self.cropSize;
