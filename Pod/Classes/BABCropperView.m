@@ -57,68 +57,43 @@ static CGSize BABCropperViewScaledSizeToFitSize(CGSize size, CGSize fitSize) {
     return fittedSize;
 }
 
-static CGSize BABScaledSizeFromSizeToWidth(CGSize fromSize, CGFloat width) {
-    
-    CGFloat scale = fromSize.width / width;
-    return CGSizeMake(width, fromSize.height/scale);
-}
-
-static CGSize BABScaledSizeFromSizeToHeight(CGSize fromSize, CGFloat height) {
-    
-    CGFloat scale = fromSize.height / height;
-    return CGSizeMake(fromSize.width/scale, height);
-}
-
 static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle, BOOL transparent) {
     
     CGSize imageSize = image.size;
-    
     CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
-    
     CGFloat scale = 1.0f;
     
     if(cropRect.size.width > cropRect.size.height) {
-        
         scale = scaleSize.width/cropRect.size.width;
     }
     else {
-        
         scale = scaleSize.height/cropRect.size.height;
     }
     
     CGContextRef bitmap = CGBitmapContextCreate(NULL, scaleSize.width, scaleSize.height, 8, scaleSize.width * 4, colorspace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
     
-    CGSize scaledSize;
-    
-    switch (image.imageOrientation) {
-        case UIImageOrientationUp:
-        case UIImageOrientationUpMirrored:
-        case UIImageOrientationDown:
-        case UIImageOrientationDownMirrored: {
-            
-            scaledSize = BABScaledSizeFromSizeToWidth(imageSize, scaleSize.width);
-        }
-            break;
-        case UIImageOrientationLeft:
-        case UIImageOrientationLeftMirrored:
-        case UIImageOrientationRight:
-        case UIImageOrientationRightMirrored: {
-            
-            scaledSize = BABScaledSizeFromSizeToHeight(imageSize, scaleSize.height);
-        }
-            break;
-            
-        default:
-            break;
-    }
-    
     CGRect drawRect = CGRectMake(-cropRect.origin.x, -cropRect.origin.y, imageSize.width, imageSize.height);
     drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformMakeScale(scale, scale));
-    CGAffineTransform rectTransform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0f, -1.0f), CGAffineTransformMakeTranslation(0.0f, scaleSize.height));
+    
+    CGAffineTransform rectTransform;
+    switch (image.imageOrientation)
+    {
+        case UIImageOrientationLeft:
+            rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(M_PI_2), 0, -drawRect.size.height);
+            break;
+        case UIImageOrientationRight:
+            rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI_2), -drawRect.size.width, 0);
+            break;
+        case UIImageOrientationDown:
+            rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI),
+                                                       -drawRect.size.width, -drawRect.size.height);
+            break;
+        default:
+            rectTransform = CGAffineTransformIdentity;
+    };
     drawRect = CGRectApplyAffineTransform(drawRect, rectTransform);
     
     if(cropToCircle) {
-        
         CGContextAddEllipseInRect(bitmap, CGRectMake(0.0f, 0.0f, scaleSize.width, scaleSize.height));
         CGContextClip(bitmap);
     }
@@ -126,14 +101,12 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     CGContextSetInterpolationQuality(bitmap, kCGInterpolationHigh);
     
     if(!transparent) {
-        
         CGContextFillRect(bitmap, CGRectMake(0.0f, 0.0f, cropRect.size.width, cropRect.size.height));
     }
     
     CGContextDrawImage(bitmap, drawRect, image.CGImage);
-    
     CGImageRef newImageRef = CGBitmapContextCreateImage(bitmap);
-    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
+    UIImage *newImage = [UIImage imageWithCGImage:newImageRef scale:scale orientation:image.imageOrientation];
     
     CGContextRelease(bitmap);
     CGImageRelease(newImageRef);
@@ -187,7 +160,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     self.cropDisplayOffset = UIOffsetZero;
     
     self.backgroundColor = [UIColor blackColor];
-
+    
     self.scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.scrollView.showsHorizontalScrollIndicator = NO;
@@ -334,16 +307,16 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
 - (void)updateMaskView {
     
     self.borderView.frame = self.displayCropRect;
-
+    
     CAShapeLayer *maskLayer = (CAShapeLayer *)self.cropMaskView.layer.mask;
     maskLayer.frame = self.cropMaskView.bounds;
-
+    
     if(self.cropsImageToCircle){
         
         UIBezierPath *path = [UIBezierPath bezierPathWithOvalInRect:self.displayCropRect];
         [path appendPath:[UIBezierPath bezierPathWithRect:maskLayer.frame]];
         maskLayer.path = path.CGPath;
-
+        
     }
     else {
         
@@ -357,7 +330,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     
     CGFloat contentSizeWidth = scrollView.contentSize.width + scrollView.contentInset.left + scrollView.contentInset.right;
     CGFloat contentSizeHeight = scrollView.contentSize.height + scrollView.contentInset.top + scrollView.contentInset.bottom;
-
+    
     CGFloat offsetX = (scrollView.bounds.size.width > contentSizeWidth)? (scrollView.bounds.size.width - contentSizeWidth) * 0.5f : 0.0f;
     CGFloat offsetY = (scrollView.bounds.size.height > contentSizeHeight)? (scrollView.bounds.size.height - contentSizeHeight) * 0.5f : 0.0f;
     
@@ -368,7 +341,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
 #pragma mark - Public Methods
 
 - (void)renderCroppedImage:(void (^)(UIImage *croppedImage))completionBlock {
- 
+    
     CGRect cropFrameRect;
     cropFrameRect.origin.x = self.scrollView.bounds.origin.x + self.scrollView.contentInset.left;
     cropFrameRect.origin.y = self.scrollView.bounds.origin.y + self.scrollView.contentInset.top;
