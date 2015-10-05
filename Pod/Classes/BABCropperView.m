@@ -72,26 +72,31 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     
     CGContextRef bitmap = CGBitmapContextCreate(NULL, scaleSize.width, scaleSize.height, 8, scaleSize.width * 4, colorspace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
     
-    CGRect drawRect = CGRectMake(-cropRect.origin.x, -cropRect.origin.y, imageSize.width, imageSize.height);
+    CGRect drawRect = CGRectMake(0.0f, 0.0f, imageSize.width, imageSize.height);
     drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformMakeScale(scale, scale));
     
     CGAffineTransform rectTransform;
+    CGPoint shift = CGPointMake(cropRect.origin.x, cropRect.origin.y);
     switch (image.imageOrientation)
     {
         case UIImageOrientationLeft:
             rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(M_PI_2), 0, -drawRect.size.height);
+            shift = CGPointMake(imageSize.height - shift.y - cropRect.size.width, imageSize.width - shift.x - cropRect.size.height);
             break;
         case UIImageOrientationRight:
             rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI_2), -drawRect.size.width, 0);
+            shift = CGPointMake(shift.y, shift.x);
             break;
         case UIImageOrientationDown:
-            rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI),
-                                                       -drawRect.size.width, -drawRect.size.height);
+            rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI), -drawRect.size.width, -drawRect.size.height);
+            shift = CGPointMake(imageSize.width - shift.x - cropRect.size.height, shift.y);
             break;
         default:
             rectTransform = CGAffineTransformIdentity;
+            shift = CGPointMake(shift.x, imageSize.height - shift.y - cropRect.size.width);
     };
     drawRect = CGRectApplyAffineTransform(drawRect, rectTransform);
+    drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformMakeTranslation(-shift.x * scale, -shift.y * scale));
     
     if(cropToCircle) {
         CGContextAddEllipseInRect(bitmap, CGRectMake(0.0f, 0.0f, scaleSize.width, scaleSize.height));
