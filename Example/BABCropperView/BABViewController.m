@@ -61,7 +61,7 @@
         
         __weak typeof(self)weakSelf = self;
         
-        [self.cropperView renderCroppedImage:^(UIImage *croppedImage){
+        [self.cropperView renderCroppedImage:^(UIImage *croppedImage, CGRect cropRect){
             
             [weakSelf displayCroppedImage:croppedImage];
         }];
