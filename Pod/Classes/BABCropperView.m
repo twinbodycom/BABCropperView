@@ -87,13 +87,17 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
             rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI_2), -drawRect.size.width, 0);
             shift = CGPointMake(shift.y, shift.x);
             break;
+        case UIImageOrientationUp:
+            rectTransform = CGAffineTransformIdentity;
+            shift = CGPointMake(shift.x, imageSize.height - shift.y - cropRect.size.height);
+            break;
         case UIImageOrientationDown:
             rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI), -drawRect.size.width, -drawRect.size.height);
             shift = CGPointMake(imageSize.width - shift.x - cropRect.size.height, shift.y);
             break;
         default:
             rectTransform = CGAffineTransformIdentity;
-            shift = CGPointMake(shift.x, imageSize.height - shift.y - cropRect.size.width);
+            break;
     };
     drawRect = CGRectApplyAffineTransform(drawRect, rectTransform);
     drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformMakeTranslation(-shift.x * scale, -shift.y * scale));
