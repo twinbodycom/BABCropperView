@@ -244,7 +244,8 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         displayCropRect.origin.y += self.cropDisplayOffset.vertical;
         self.displayCropRect = displayCropRect;
         
-        
+        self.borderView.frame = self.displayCropRect;
+              
         if(self.cropsImageToCircle) {
             
             self.borderView.layer.cornerRadius = CGRectGetWidth(self.borderView.bounds)/2.0f;
@@ -314,8 +315,6 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
 }
 
 - (void)updateMaskView {
-    
-    self.borderView.frame = self.displayCropRect;
     
     CAShapeLayer *maskLayer = (CAShapeLayer *)self.cropMaskView.layer.mask;
     maskLayer.frame = self.cropMaskView.bounds;
