@@ -57,9 +57,8 @@ static CGSize BABCropperViewScaledSizeToFitSize(CGSize size, CGSize fitSize) {
     return fittedSize;
 }
 
-static CGSize flipedSize(CGSize size) {
-    CGSize newSize = CGSizeMake(size.height, size.width);
-    return newSize;
+static CGSize BABFlipedSize(CGSize size) {
+    return CGSizeMake(size.height, size.width);
 }
 
 static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle, BOOL transparent) {
@@ -85,12 +84,12 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         case UIImageOrientationLeft:
             rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(M_PI_2), 0, -drawRect.size.height);
             shift = CGPointMake(imageSize.height - shift.y - cropRect.size.width, imageSize.width - shift.x - cropRect.size.height);
-            scaleSize = flipedSize(scaleSize);
+            scaleSize = BABFlipedSize(scaleSize);
             break;
         case UIImageOrientationRight:
             rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI_2), -drawRect.size.width, 0);
             shift = CGPointMake(shift.y, shift.x);
-            scaleSize = flipedSize(scaleSize);
+            scaleSize = BABFlipedSize(scaleSize);
             break;
         case UIImageOrientationUp:
             rectTransform = CGAffineTransformIdentity;
@@ -332,7 +331,6 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         UIBezierPath *path = [UIBezierPath bezierPathWithOvalInRect:self.displayCropRect];
         [path appendPath:[UIBezierPath bezierPathWithRect:maskLayer.frame]];
         maskLayer.path = path.CGPath;
-        
     }
     else {
         
