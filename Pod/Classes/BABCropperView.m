@@ -57,6 +57,11 @@ static CGSize BABCropperViewScaledSizeToFitSize(CGSize size, CGSize fitSize) {
     return fittedSize;
 }
 
+static CGSize flipedSize(CGSize size) {
+    CGSize newSize = CGSizeMake(size.height, size.width);
+    return newSize;
+}
+
 static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle, BOOL transparent) {
     
     CGSize imageSize = image.size;
@@ -70,8 +75,6 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         scale = scaleSize.height/cropRect.size.height;
     }
     
-    CGContextRef bitmap = CGBitmapContextCreate(NULL, scaleSize.width, scaleSize.height, 8, scaleSize.width * 4, colorspace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-    
     CGRect drawRect = CGRectMake(0.0f, 0.0f, imageSize.width, imageSize.height);
     drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformMakeScale(scale, scale));
     
@@ -82,10 +85,12 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         case UIImageOrientationLeft:
             rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(M_PI_2), 0, -drawRect.size.height);
             shift = CGPointMake(imageSize.height - shift.y - cropRect.size.width, imageSize.width - shift.x - cropRect.size.height);
+            scaleSize = flipedSize(scaleSize);
             break;
         case UIImageOrientationRight:
             rectTransform = CGAffineTransformTranslate(CGAffineTransformMakeRotation(-M_PI_2), -drawRect.size.width, 0);
             shift = CGPointMake(shift.y, shift.x);
+            scaleSize = flipedSize(scaleSize);
             break;
         case UIImageOrientationUp:
             rectTransform = CGAffineTransformIdentity;
@@ -101,6 +106,8 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     };
     drawRect = CGRectApplyAffineTransform(drawRect, rectTransform);
     drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformMakeTranslation(-shift.x * scale, -shift.y * scale));
+    
+    CGContextRef bitmap = CGBitmapContextCreate(NULL, scaleSize.width, scaleSize.height, 8, scaleSize.width * 4, colorspace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
     
     if(cropToCircle) {
         CGContextAddEllipseInRect(bitmap, CGRectMake(0.0f, 0.0f, scaleSize.width, scaleSize.height));
@@ -244,8 +251,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         displayCropRect.origin.y += self.cropDisplayOffset.vertical;
         self.displayCropRect = displayCropRect;
         
-        self.borderView.frame = self.displayCropRect;
-              
+        
         if(self.cropsImageToCircle) {
             
             self.borderView.layer.cornerRadius = CGRectGetWidth(self.borderView.bounds)/2.0f;
@@ -315,6 +321,8 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
 }
 
 - (void)updateMaskView {
+    
+    self.borderView.frame = self.displayCropRect;
     
     CAShapeLayer *maskLayer = (CAShapeLayer *)self.cropMaskView.layer.mask;
     maskLayer.frame = self.cropMaskView.bounds;
