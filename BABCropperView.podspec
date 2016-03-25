@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "BABCropperView"
-  s.version          = "0.4.6"
+  s.version          = "0.4.7"
   s.summary          = "A customizable image cropper view based on UIScrollView."
   s.description      = <<-DESC
                        A customizable image cropper view based on UIScrollView.
@@ -36,7 +36,4 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
-  s.resource_bundles = {
-    'BABCropperView' => ['Pod/Assets/*.png']
-  }
 end
