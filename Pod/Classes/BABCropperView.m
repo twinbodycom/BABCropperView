@@ -283,26 +283,29 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         CGFloat scaleBasedOnHeight = self.displayCropSize.height/imageHeight;
         CGFloat scaleBasedOnWidth = self.displayCropSize.width/imageWidth;
         
+        CGFloat minimumZoomScaleBasedOnHeight = self.allowsNegativeSpaceInCroppedImage ? scaleBasedOnWidth : scaleBasedOnHeight;
+        CGFloat minimumZoomScalescaleBasedOnWidth = self.allowsNegativeSpaceInCroppedImage ? scaleBasedOnHeight : scaleBasedOnWidth;
+        
         if(imageViewHeight > imageViewWidth) { //portrait image
             
             if(scrollViewHeight > scrollViewWidth && self.cropSize.width/self.cropSize.height < imageViewWidth/imageViewHeight) {
                 
-                self.scrollView.minimumZoomScale = scaleBasedOnHeight;
+                self.scrollView.minimumZoomScale = minimumZoomScaleBasedOnHeight;
             }
             else {
                 
-                self.scrollView.minimumZoomScale = scaleBasedOnWidth;
+                self.scrollView.minimumZoomScale = minimumZoomScalescaleBasedOnWidth;
             }
         }
         else { //landscape image
             
             if((scrollViewHeight >= scrollViewWidth) || (self.cropSize.width/self.cropSize.height < imageViewWidth/imageViewHeight)) {
                 
-                self.scrollView.minimumZoomScale = scaleBasedOnHeight;
+                self.scrollView.minimumZoomScale = minimumZoomScaleBasedOnHeight;
             }
             else {
                 
-                self.scrollView.minimumZoomScale = scaleBasedOnWidth;
+                self.scrollView.minimumZoomScale = minimumZoomScalescaleBasedOnWidth;
             }
         }
         
