@@ -1,7 +1,7 @@
 # BABCropperView
 A customizable image cropper view based on UIScrollView.
 
-![Sample Project](http://www.brynbodayle.com/Files/BABCropperView.gif)
+![Sample Project](Example/BABCropperView.gif)
 
 Supports iOS 7.0+
 
