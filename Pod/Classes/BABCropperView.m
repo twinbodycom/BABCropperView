@@ -133,7 +133,6 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
 @interface BABCropperView()<UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *scrollView;
-@property (nonatomic, strong) UIImageView *imageView;
 @property (nonatomic, strong) UIView *borderView;
 
 @property (nonatomic, assign) CGSize scaledCropSize;
