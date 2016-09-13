@@ -13,6 +13,7 @@
 @property (nonatomic, assign) CGSize cropSize;
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIBezierPath *cropMaskPath;
 @property (nonatomic, strong) UIView *cropMaskView;
 @property (nonatomic, readonly) UIView *borderView;
