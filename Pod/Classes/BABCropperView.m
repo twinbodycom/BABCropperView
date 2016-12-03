@@ -174,14 +174,14 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     
     self.backgroundColor = [UIColor blackColor];
     
-    self.scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+    _scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
     self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.showsVerticalScrollIndicator = NO;
     self.scrollView.delegate = self;
     [self addSubview:self.scrollView];
     
-    self.imageView = [[UIImageView alloc] init];
+    _imageView = [[UIImageView alloc] init];
     [self.scrollView addSubview:self.imageView];
     
     self.cropMaskView = [[UIView alloc] initWithFrame:self.bounds];
