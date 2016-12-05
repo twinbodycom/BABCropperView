@@ -1,9 +1,9 @@
-# BABCropperView
+ # BABCropperView
 A customizable image cropper view based on UIScrollView.
 
 ![Sample Project](Example/BABCropperView.gif)
 
-Supports iOS 7.0+
+Supports iOS 8.0+
 
 * Crop size is fully configurable
 * Allows cropping of any part of the image
@@ -20,7 +20,7 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Requirements
 
-- Requires iOS 7.0+
+- Requires iOS 8.0+
 
 ## Installation
 
