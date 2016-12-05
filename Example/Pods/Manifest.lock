@@ -1,5 +1,5 @@
 PODS:
-  - BABCropperView (0.4.0)
+  - BABCropperView (0.5.1)
 
 DEPENDENCIES:
   - BABCropperView (from `../`)
@@ -9,6 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  BABCropperView: 0e0569987d9998039135b1c4acd5471310daf8c1
+  BABCropperView: 56d7f6e51415bc6bf357be281c6e91c96bb28438
 
-COCOAPODS: 0.38.2
+PODFILE CHECKSUM: 0cd8bea1c41b9d20cf9b4952107bee5debea7f20
+
+COCOAPODS: 1.1.1

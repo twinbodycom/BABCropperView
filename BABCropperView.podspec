@@ -9,12 +9,12 @@
 
 Pod::Spec.new do |s|
   s.name             = "BABCropperView"
-  s.version          = "0.5.0"
+  s.version          = "0.5.1"
   s.summary          = "A customizable image cropper view based on UIScrollView."
   s.description      = <<-DESC
                        A customizable image cropper view based on UIScrollView.
 											 
-											 Supports iOS 7.0+
+											 Supports iOS 8.0+
 
 											 * Crop size is fully configurable
 											 * Allows cropping of any part of the image
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => "https://github.com/brynbodayle/BABCropperView.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/brynbodayle'
 
-  s.platform     = :ios, '7.0'
+  s.platform     = :ios, '8.0'
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'

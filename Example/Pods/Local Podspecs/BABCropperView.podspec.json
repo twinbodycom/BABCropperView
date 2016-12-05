@@ -1,8 +1,8 @@
 {
   "name": "BABCropperView",
-  "version": "0.4.0",
+  "version": "0.5.1",
   "summary": "A customizable image cropper view based on UIScrollView.",
-  "description": "A customizable image cropper view based on UIScrollView.\n\nSupports iOS 7.0+\n\n* Crop size is fully configurable\n* Allows cropping of any part of the image\n* Fully customizable with sensible defaults\n* Works easily with or without Auto Layout\n* Uses memory efficient image crop which handles multiple image orientations\n\nThis is a UIView subclass which allows a user to crop an image to a desired size.",
+  "description": "A customizable image cropper view based on UIScrollView.\n\nSupports iOS 8.0+\n\n* Crop size is fully configurable\n* Allows cropping of any part of the image\n* Fully customizable with sensible defaults\n* Works easily with or without Auto Layout\n* Uses memory efficient image crop which handles multiple image orientations\n\nThis is a UIView subclass which allows a user to crop an image to a desired size.",
   "homepage": "https://github.com/brynbodayle/BABCropperView",
   "screenshots": "http://brynbodayle.com/Files/BABCropperView.gif",
   "license": "MIT",
@@ -11,17 +11,12 @@
   },
   "source": {
     "git": "https://github.com/brynbodayle/BABCropperView.git",
-    "tag": "0.4.0"
+    "tag": "0.5.1"
   },
   "social_media_url": "https://twitter.com/brynbodayle",
   "platforms": {
-    "ios": "7.0"
+    "ios": "8.0"
   },
   "requires_arc": true,
-  "source_files": "Pod/Classes/**/*",
-  "resource_bundles": {
-    "BABCropperView": [
-      "Pod/Assets/*.png"
-    ]
-  }
+  "source_files": "Pod/Classes/**/*"
 }
