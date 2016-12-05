@@ -1,4 +1,4 @@
- # BABCropperView
+## BABCropperView
 A customizable image cropper view based on UIScrollView.
 
 ![Sample Project](Example/BABCropperView.gif)
