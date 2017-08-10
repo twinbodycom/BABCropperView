@@ -284,15 +284,19 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         CGFloat minimumZoomScaleBasedOnHeight = self.allowsNegativeSpaceInCroppedImage ? scaleBasedOnWidth : scaleBasedOnHeight;
         CGFloat minimumZoomScalescaleBasedOnWidth = self.allowsNegativeSpaceInCroppedImage ? scaleBasedOnHeight : scaleBasedOnWidth;
         
+        CGFloat startingZoomScale;
+        
         if(imageViewHeight > imageViewWidth) { //portrait image
             
             if(scrollViewHeight > scrollViewWidth && self.cropSize.width/self.cropSize.height < imageViewWidth/imageViewHeight) {
                 
                 self.scrollView.minimumZoomScale = minimumZoomScaleBasedOnHeight;
+                startingZoomScale = minimumZoomScalescaleBasedOnWidth;
             }
             else {
                 
                 self.scrollView.minimumZoomScale = minimumZoomScalescaleBasedOnWidth;
+                startingZoomScale = minimumZoomScaleBasedOnHeight;
             }
         }
         else { //landscape image
@@ -300,15 +304,17 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
             if((scrollViewHeight >= scrollViewWidth) || (self.cropSize.width/self.cropSize.height < imageViewWidth/imageViewHeight)) {
                 
                 self.scrollView.minimumZoomScale = minimumZoomScaleBasedOnHeight;
+                startingZoomScale = minimumZoomScalescaleBasedOnWidth;
             }
             else {
                 
                 self.scrollView.minimumZoomScale = minimumZoomScalescaleBasedOnWidth;
+                startingZoomScale = minimumZoomScaleBasedOnHeight;
             }
         }
         
         self.scrollView.maximumZoomScale = BABCropperViewMaximumZoomScale;
-        self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
+        self.scrollView.zoomScale = self.startZoomedToFill ? startingZoomScale : self.scrollView.minimumZoomScale;
     }
 }
 
