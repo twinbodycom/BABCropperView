@@ -301,7 +301,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         }
         else { //landscape image
             
-            if((scrollViewHeight >= scrollViewWidth) || (self.cropSize.width/self.cropSize.height < imageViewWidth/imageViewHeight)) {
+            if((scrollViewHeight >= scrollViewWidth) && (self.cropSize.width/self.cropSize.height < imageViewWidth/imageViewHeight)) {
                 
                 self.scrollView.minimumZoomScale = minimumZoomScaleBasedOnHeight;
                 startingZoomScale = minimumZoomScalescaleBasedOnWidth;
