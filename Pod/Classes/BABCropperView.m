@@ -121,7 +121,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     
     CGContextDrawImage(bitmap, drawRect, image.CGImage);
     CGImageRef newImageRef = CGBitmapContextCreateImage(bitmap);
-    UIImage *newImage = [UIImage imageWithCGImage:newImageRef scale:scale orientation:image.imageOrientation];
+    UIImage *newImage = [UIImage imageWithCGImage:newImageRef scale:1.0f orientation:image.imageOrientation];
     
     CGContextRelease(bitmap);
     CGImageRelease(newImageRef);
