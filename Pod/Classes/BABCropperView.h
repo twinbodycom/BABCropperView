@@ -24,6 +24,8 @@
 @property (nonatomic, assign) BOOL allowsNegativeSpaceInCroppedImage; //defaults to NO
 @property (nonatomic, assign) BOOL startZoomedToFill; // defaults to NO
 
+@property (nonatomic, assign) BOOL isProfilePicture;
+
 - (void)renderCroppedImage:(void (^)(UIImage *croppedImage, CGRect cropRect))completionBlock;
 
 @end

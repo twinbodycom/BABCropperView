@@ -341,7 +341,14 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     }
     else {
         
-        UIBezierPath *path = [UIBezierPath bezierPathWithRect:self.displayCropRect];
+        UIBezierPath *path = nil;
+        if (self.isProfilePicture) {
+            path = [UIBezierPath bezierPathWithRoundedRect:self.displayCropRect cornerRadius:CGRectGetWidth(self.displayCropRect)/2];
+            self.borderView.layer.cornerRadius = CGRectGetWidth(self.borderView.frame)/2;
+        } else {
+            path = [UIBezierPath bezierPathWithRect:self.displayCropRect];;
+        }
+
         [path appendPath:[UIBezierPath bezierPathWithRect:maskLayer.frame]];
         maskLayer.path = path.CGPath;
     }
