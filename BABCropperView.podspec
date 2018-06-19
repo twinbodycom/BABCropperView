@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "BABCropperView"
-  s.version          = "0.5.3"
+  s.version          = "0.5.4"
   s.summary          = "A customizable image cropper view based on UIScrollView."
   s.description      = <<-DESC
                        A customizable image cropper view based on UIScrollView.
@@ -26,10 +26,10 @@ Pod::Spec.new do |s|
 											 
                        DESC
   s.homepage         = "https://github.com/brynbodayle/BABCropperView"
-	s.screenshots			 = "http://brynbodayle.com/Files/BABCropperView.gif"
+  s.screenshots		 = "http://brynbodayle.com/Files/BABCropperView.gif"
   s.license          = 'MIT'
   s.author           = { "Bryn Bodayle" => "bryn.bodayle@gmail.com" }
-  s.source           = { :git => "https://github.com/brynbodayle/BABCropperView.git", :tag => s.version.to_s }
+  s.source           = { :git => "https://github.com/twinbodycom/BABCropperView.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/brynbodayle'
 
   s.platform     = :ios, '8.0'
