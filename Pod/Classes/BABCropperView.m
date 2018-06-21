@@ -61,7 +61,7 @@ static CGSize BABFlipedSize(CGSize size) {
     return CGSizeMake(size.height, size.width);
 }
 
-static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle, BOOL transparent) {
+static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, CGRect cropRect, CGSize scaleSize, BOOL cropToCircle, BOOL transparent, BOOL allowsNegativeSpaceInCroppedImage) {
     
     CGSize imageSize = image.size;
     CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
@@ -106,7 +106,29 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     drawRect = CGRectApplyAffineTransform(drawRect, rectTransform);
     drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformMakeTranslation(-shift.x * scale, -shift.y * scale));
     
-    CGContextRef bitmap = CGBitmapContextCreate(NULL, scaleSize.width, scaleSize.height, 8, scaleSize.width * 4, colorspace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+    //  fork
+    if (allowsNegativeSpaceInCroppedImage) {
+        // was 'if (drawRect.size.height < scaleSize.height)'
+        // it was working bad if the difference was small (for captured images, not for images from the gallery)
+        if ((drawRect.size.height - scaleSize.height) <= -1) {
+            //  remove top and bottom insets
+            scaleSize.height -= drawRect.origin.y * 2; //shift.y;
+            
+            CGRect fr = drawRect;
+            fr.origin.y = 0;
+            drawRect = fr;
+        } else if (drawRect.size.width < scaleSize.width) {
+            //  remove left and right insets
+            //  30 is fix for black line at right edge of image. Not sure that source of this line is here though.
+            scaleSize.width -= drawRect.origin.x * 2; //shift.x - 30; //shift.x * 2 - 30;
+            
+            CGRect fr = drawRect;
+            fr.origin.x = 0;
+            drawRect = fr;
+        }
+    }
+    
+    CGContextRef bitmap = CGBitmapContextCreate(NULL, (int)scaleSize.width, (int)scaleSize.height, 8, (int)scaleSize.width * 4, colorspace, kCGImageAlphaPremultipliedLast);
     
     if(cropToCircle) {
         CGContextAddEllipseInRect(bitmap, CGRectMake(0.0f, 0.0f, scaleSize.width, scaleSize.height));
@@ -281,6 +303,18 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         CGFloat scaleBasedOnHeight = self.displayCropSize.height/imageHeight;
         CGFloat scaleBasedOnWidth = self.displayCropSize.width/imageWidth;
         
+        //  fork
+        if (self.allowsNegativeSpaceInCroppedImage) {
+            //  server restriction: "The width should be less than double the height"
+            //  this is made to avoid of very wide or very heigh result images
+            //
+            //  MAX() is fix for case when image height is slighty bigger than its width
+            //  in that case image heigth was not fit crop frame height (i.e. scale was too small)
+            //  (for captured images, not for images from the gallery)
+            scaleBasedOnHeight = MAX (scaleBasedOnHeight, self.displayCropSize.width / (imageWidth * 1.8));
+            scaleBasedOnWidth = MAX (scaleBasedOnWidth, self.displayCropSize.height / (imageHeight * 1.8));
+        }
+        
         CGFloat minimumZoomScaleBasedOnHeight = self.allowsNegativeSpaceInCroppedImage ? scaleBasedOnWidth : scaleBasedOnHeight;
         CGFloat minimumZoomScalescaleBasedOnWidth = self.allowsNegativeSpaceInCroppedImage ? scaleBasedOnHeight : scaleBasedOnWidth;
         
@@ -341,6 +375,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     }
     else {
         
+        //  fork
         UIBezierPath *path = nil;
         if (self.isProfilePicture) {
             path = [UIBezierPath bezierPathWithRoundedRect:self.displayCropRect cornerRadius:CGRectGetWidth(self.displayCropRect)/2];
@@ -348,7 +383,7 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
         } else {
             path = [UIBezierPath bezierPathWithRect:self.displayCropRect];;
         }
-
+        
         [path appendPath:[UIBezierPath bezierPathWithRect:maskLayer.frame]];
         maskLayer.path = path.CGPath;
     }
@@ -382,10 +417,15 @@ static UIImage* BABCropperViewCroppedAndScaledImageWithCropRect(UIImage *image, 
     CGSize cropSize = self.cropSize;
     BOOL cropToCircle = self.cropsImageToCircle;
     BOOL leavesUnfilledRegionsTransparent = self.leavesUnfilledRegionsTransparent;
+    BOOL  allowsNegativeSpaceInCroppedImage = self.allowsNegativeSpaceInCroppedImage;
+    
+    //  Fork
+    //  Normalize
+    CGSize normalizedSize = CGSizeMake((NSInteger) (floor(cropSize.width)), (NSInteger) (floor(cropSize.height)));
     
     [self.operationQueue addOperationWithBlock:^{
         
-        UIImage *croppedImage = BABCropperViewCroppedAndScaledImageWithCropRect(image, cropRect, cropSize, cropToCircle, leavesUnfilledRegionsTransparent);
+        UIImage *croppedImage = BABCropperViewCroppedAndScaledImageWithCropRect(image, cropRect, normalizedSize, cropToCircle, leavesUnfilledRegionsTransparent, allowsNegativeSpaceInCroppedImage);
         
         dispatch_async(dispatch_get_main_queue(), ^{
             
